@@ -1,6 +1,8 @@
 ## Installation
 `pip install -r requirements.txt`
 
+Create .env file based on .env.example
+
 ## Running
 `fastapi run`
 

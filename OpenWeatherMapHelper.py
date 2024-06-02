@@ -1,7 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from exceptions import NoCityFoundError 
+from exceptions import NoCityFoundError, OpenWeatherMapError
 
 class OpenWeatherMapHelper:
     def __init__(self):
@@ -11,11 +11,14 @@ class OpenWeatherMapHelper:
         self.weather_base_url = os.getenv('OPENWEATHERMAP_WEATHER_BASE_URL')
 
     def get_geocode(self, city_name):
-        response = requests.get(self.geocode_base_url, params={
-            "q": city_name,
-            "limit": 1,
-            "appid": self.api_key,
-        })
+        try:
+            response = requests.get(self.geocode_base_url, params={
+                "q": city_name,
+                "limit": 1,
+                "appid": self.api_key,
+            })
+        except (requests.exceptions.ConnectionError):
+            raise OpenWeatherMapError()
 
         if response.status_code == 200:
             responseJson = response.json()
@@ -28,12 +31,15 @@ class OpenWeatherMapHelper:
             response.raise_for_status()
 
     def get_weather(self, lat, lon):
-        response = requests.get(self.weather_base_url, params={
-            "lat": lat,
-            "lon": lon,
-            "units": "metric",
-            "appid": self.api_key,
-        })
+        try:
+            response = requests.get(self.weather_base_url, params={
+                "lat": lat,
+                "lon": lon,
+                "units": "metric",
+                "appid": self.api_key,
+            })
+        except (requests.exceptions.ConnectionError):
+            raise OpenWeatherMapError()
         
         if response.status_code == 200:
             return response.json()

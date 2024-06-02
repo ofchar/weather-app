@@ -1,0 +1,6 @@
+fastapi
+requests
+python-dotenv
+httpx
+pytest
+pytest-mock

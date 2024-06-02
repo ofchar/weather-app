@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 from utils import get_geo_from_response, parse_weather_data
 from OpenWeatherMapHelper import OpenWeatherMapHelper
-
+from models import WeatherModel
 
 openWeatherMapHelper = OpenWeatherMapHelper()
 
 app = FastAPI()
 
 
-@app.get("/weather/{city}")
-async def get_weather(city: str):
+@app.get("/weather/{city}", response_model=WeatherModel, responses={404: {"detail": "No city found with the given name."}, 500: {"detail": "Cannot connect to OpenWeatherMap"}})
+async def get_weather(city: str) -> WeatherModel:
     geocode_matches = openWeatherMapHelper.get_geocode(city)
 
     lat, lon = get_geo_from_response(geocode_matches)

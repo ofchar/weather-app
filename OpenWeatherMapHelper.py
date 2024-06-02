@@ -10,7 +10,8 @@ class OpenWeatherMapHelper:
         self.geocode_base_url = os.getenv('OPENWEATHERMAP_GEOCODE_BASE_URL')
         self.weather_base_url = os.getenv('OPENWEATHERMAP_WEATHER_BASE_URL')
 
-    def get_geocode(self, city_name):
+    def get_geocode(self, city_name: str):
+        """Get geocode data for searched city using OpenWeatherMap's Geocoding API"""
         try:
             response = requests.get(self.geocode_base_url, params={
                 "q": city_name,
@@ -21,16 +22,19 @@ class OpenWeatherMapHelper:
             raise OpenWeatherMapError()
 
         if response.status_code == 200:
-            responseJson = response.json()
+            response_json = response.json()
 
-            if len(responseJson) == 0:
+            if len(response_json) == 0:
                 raise NoCityFoundError()
 
             return response.json()
         else:
-            response.raise_for_status()
+            # 'Log' the status code for debugging purposes but keep it away from end users.
+            print('get_geocode response error code: ' + str(response.status_code))
+            raise OpenWeatherMapError()
 
-    def get_weather(self, lat, lon):
+    def get_weather(self, lat: float, lon: float):
+        """Get weather data for given location"""
         try:
             response = requests.get(self.weather_base_url, params={
                 "lat": lat,
@@ -44,5 +48,7 @@ class OpenWeatherMapHelper:
         if response.status_code == 200:
             return response.json()
         else:
-            response.raise_for_status()
+            # 'Log' the status code for debugging purposes but keep it away from end users.
+            print('get_weather response error code: ' + str(response.status_code))
+            raise OpenWeatherMapError()
 
